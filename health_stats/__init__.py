@@ -7,7 +7,7 @@ health-stats
 from collections import namedtuple, OrderedDict
 
 import numpy
-from pretty import pprint
+# from pretty import pprint
 
 __version__ = '0.0.1'
 

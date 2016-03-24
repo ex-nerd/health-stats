@@ -5,18 +5,18 @@ from __future__ import print_function
 import os
 import sys
 import yaml
-import datetime
+# import datetime
 
 from collections import namedtuple
 
-from pretty import pprint
+# from pretty import pprint
 
 import glob
 
 from health_stats.date_range import DateRange
 
-# List of known input types (lower case)
-INPUT_TYPES = ('mysugr_csv',)
+from health_stats.parser import Parsers
+from health_stats.reports import Reports
 
 
 class ConfigData(object):
@@ -27,13 +27,14 @@ class ConfigData(object):
     """
 
     __InputConfig = namedtuple('InputConfig', ['format', 'tz', 'paths'])
+    __ReportConfig = namedtuple('ReportConfig', ['format', 'path'])
 
     class __ConfigData(object):
 
         __slots__ = (
             'date_range',
             'inputs',
-            'outputs',
+            'reports',
         )
 
         def Initialize(self, path):
@@ -45,6 +46,7 @@ class ConfigData(object):
                 except yaml.YAMLError as err:
                     print(err, file=sys.stderr)
                     exit(1)
+
             # Parse the configured date_rage
             if 'date_range' not in conf:
                 raise ValueError('Missing date_range section in config file: {}'.format(path))
@@ -53,14 +55,16 @@ class ConfigData(object):
                 end=conf['date_range'].get('end'),
                 tz=conf['date_range'].get('tz'),
             )
-            # And the list of input files
+
+            # The list of input files
             if 'inputs' not in conf:
                 raise ValueError('Missing inputs section in config file: {}'.format(path))
             self.inputs = []
             for input in conf['inputs']:
                 # Known inputs?
-                if input['format'].lower() not in INPUT_TYPES:
-                    raise ValueError('Unrecognized input file format: {} not in {}'.format(input['format'], INPUT_TYPES))
+                input['format'] = input['format'].lower()
+                if input['format'] not in Parsers:
+                    raise ValueError('Unrecognized input file format: {} not in {}'.format(input['format'], Parsers))
                 # Expand and parse the list of input files
                 found_paths = []
                 for path in input['paths']:
@@ -73,6 +77,20 @@ class ConfigData(object):
                         paths=found_paths,
                     ))
 
+            # The list of requested reports to be generated
+            if 'reports' not in conf:
+                raise ValueError('Missing reports section in config file: {}'.format(path))
+            self.reports = []
+            for report in conf['reports']:
+                # Known report formats?
+                if report['format'] not in Reports:
+                    raise ValueError('Unrecognized report file format: {} not in {}'.format(report['format'], Reports))
+                # Expand the path and add this to the list of requested reports to generate
+                self.reports.append(ConfigData.__ReportConfig(
+                    format=report['format'],
+                    path=os.path.expanduser(report['path']),
+                ))
+
         def __pretty__(self, p, cycle):
             p.text('<{0}: '.format(type(self).__name__))
             if cycle:
@@ -83,7 +101,6 @@ class ConfigData(object):
                     'inputs': p.pretty(self.inputs),
                 })
             p.text('>')
-
 
     # Singleton handler
     instance = None

@@ -7,7 +7,6 @@ from datetime import datetime
 from health_stats import LogEvent, InsulinData, MealData
 from health_stats.date_range import DateRange
 
-
 class LogParser(object):
     """ Abstract top level class for all parsers """
 
@@ -111,3 +110,7 @@ class MySugrLogParser(CSVLogParser):
             bp_diastolic=bp_diastolic,
             weight_lbs=float(row[self.BODY_WEIGHT]) if row[self.BODY_WEIGHT] else None,
         )
+
+Parsers = {
+    'mysugr_csv': MySugrLogParser,
+}
