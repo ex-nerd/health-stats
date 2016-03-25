@@ -51,5 +51,5 @@ def parse():
 
     # Make some output
     for report in Config.reports:
-        r = Reports[report.format](stats)
-        r.render(report.path)
+        r = report.report(stats)
+        r.render(report.output)

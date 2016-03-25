@@ -27,7 +27,7 @@ class ConfigData(object):
     """
 
     __InputConfig = namedtuple('InputConfig', ['format', 'tz', 'paths'])
-    __ReportConfig = namedtuple('ReportConfig', ['format', 'path'])
+    __ReportConfig = namedtuple('ReportConfig', ['report', 'output'])
 
     class __ConfigData(object):
 
@@ -87,8 +87,8 @@ class ConfigData(object):
                     raise ValueError('Unrecognized report file format: {} not in {}'.format(report['format'], Reports))
                 # Expand the path and add this to the list of requested reports to generate
                 self.reports.append(ConfigData.__ReportConfig(
-                    format=report['format'],
-                    path=os.path.expanduser(report['path']),
+                    report=Reports[report['format']],
+                    output=os.path.expanduser(report['output']),
                 ))
 
         def __pretty__(self, p, cycle):
