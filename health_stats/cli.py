@@ -6,8 +6,7 @@ import sys
 import argparse
 from pretty import pprint
 
-from health_stats import HealthStats
-from health_stats.parser import MySugrLogParser
+from health_stats.parsers import Parsers
 from health_stats.config import Config
 
 from health_stats.reports import Reports
@@ -39,17 +38,18 @@ def parse():
     # Parse the config file
     Config.Initialize(args.config)
 
-    # Parse the input files
-    stats = HealthStats()
+    # Parse the input files into the database
     for input_config in Config.inputs:
+        parser_class = Parsers[input_config.format]
         for path in input_config.paths:
             print(path)
-            parser = MySugrLogParser(Config.date_range)
-            events = parser.parse_log(path)
-            stats.extend(events)
-    stats.analyze()
+            parser = parser_class(Config.date_range)
+            parser.parse_log(path)
 
     # Make some output
     for report in Config.reports:
-        r = report.report(stats)
+        r = report.report(
+            start=Config.date_range.start,
+            end=Config.date_range.end,
+        )
         r.render(report.output)

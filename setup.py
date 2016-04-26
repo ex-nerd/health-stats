@@ -10,7 +10,7 @@ if sys.version_info < (2, 7):
 elif sys.version_info < (3, 0):
     install_requires += ['future']
 
-install_requires += ['pretty', 'plotly', 'pytz']
+install_requires += ['pretty', 'plotly', 'pytz', 'sqlalchemy']
 
 # Load the version by reading prep.py, so we don't run into
 # dependency loops by importing it into setup.py

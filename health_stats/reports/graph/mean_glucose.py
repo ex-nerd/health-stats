@@ -6,6 +6,14 @@ from plotly.graph_objs import Scatter
 
 from ..report import Report
 
+from health_stats.models.events import *
+from health_stats.database import DBSession
+from health_stats.dataset import DataSet
+
+import numpy
+
+# from sqlalchemy.orm import with_polymorphic
+
 
 class MeanGlucose(Report):
 
@@ -21,38 +29,33 @@ class MeanGlucose(Report):
         ay_upper = []
         ay_lower = []
 
-        for (day, daily_log) in self.stats.days.items():
+        session = DBSession()
+        events = session.query(GlucoseEvent)
+        if self.start:
+            events = events.filter(Event.time >= "{}".format(self.start))
+        if self.end:
+            events = events.filter(Event.time <= "{}".format(self.end))
+        events = events.order_by(Event.time)
+        data = DataSet(
+            events,
+            lambda e: e.time.date()
+        )
 
-            glucose_readings = 0
-            for event in daily_log.events:
-                text_log = []
-                if event.glucose:
-                    glucose_readings += 1
-                    gx.append(event.event_time)
-                    gy.append(event.glucose)
-                    text_log.append(
-                        'glucose:   {0} mg/dl'.format(event.glucose))
-                if event.insulin.basal:
-                    text_log.append(
-                        'lantus:    {0}'.format(event.insulin.basal))
-                if event.meal.carbs:
-                    text_log.append('carbs:     {0}g'.format(event.meal.carbs))
-                if event.meal.description:
-                    text_log.append(
-                        'meal:      {0}'.format(event.meal.description))
-                if len(event.tags):
-                    text_log.append(
-                        'tags:      {0}'.format(', '.join(event.tags)))
-                # We have to added the gtext after collecting all of the other
-                # data points
-                if event.glucose:
-                    gtext.append("{0}:<br>\n    {1}".format(
-                        event.event_time.strftime('%I:%M %p'), '<br>\n    '.join(text_log)))
+        for (day, daily_log) in data.group.items():
+
+            glucose_readings = []
+            for event in daily_log:
+                glucose_readings.append(int(event.value))
+                gx.append(event.time)
+                gy.append(int(event.value))
+                gtext.append("{0}: {1}".format(
+                    event.time.strftime('%I:%M %p'), event.value
+                ))
 
             # Process other daily stats
-            avg = daily_log.glucose_mean()
-            if avg is not None:
-                std = daily_log.glucose_std()
+            if glucose_readings:
+                avg = '{0:.0f}'.format(numpy.mean(glucose_readings))
+                std = '{0:.0f}'.format(numpy.std(glucose_readings))
                 # Add the entry
                 ax.append(datetime.combine(day, time(12, 0, 0, 0)))
                 ay.append(avg)
@@ -62,7 +65,7 @@ class MeanGlucose(Report):
                 # date_str = daily_log.date.strftime('%b %d')
                 # atext.append('{0}: {1} mg/dl avg &plusmn; {2}'.format(date_str, avg, std))
                 atext.append(
-                    '<b>{}</b><br>{}&sigma;{}'.format(avg, glucose_readings, std))
+                    '<b>{}</b><br>{}&sigma;{}'.format(avg, len(glucose_readings), std))
 
         # Extend the average-reading standard deviation lines to the
         # beginning/end of the graph

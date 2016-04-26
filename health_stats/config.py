@@ -9,13 +9,13 @@ import yaml
 
 from collections import namedtuple
 
-# from pretty import pprint
+from pretty import pprint
 
 import glob
 
 from health_stats.date_range import DateRange
 
-from health_stats.parser import Parsers
+from health_stats.parsers import Parsers
 from health_stats.reports import Reports
 
 
@@ -39,7 +39,7 @@ class ConfigData(object):
 
         def Initialize(self, path):
             if not path:
-                path = os.path.expanduser("~/.health_stats")
+                path = os.path.expanduser("~/.health_stats/config.yml")
             with open(path, 'rb') as file:
                 try:
                     conf = yaml.load(file)

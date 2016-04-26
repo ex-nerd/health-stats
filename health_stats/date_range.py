@@ -1,6 +1,6 @@
 
-from health_stats import LogEvent
 import datetime
+from health_stats.models.events import Event
 
 
 class DateRange(object):
@@ -19,7 +19,7 @@ class DateRange(object):
     def __contains__(self, other):
         if other is None:
             return False
-        if isinstance(other, (datetime.datetime, LogEvent)):
+        if isinstance(other, (datetime.datetime, Event)):
             # @todo support timezones
             return (other >= self.start and other <= self.end)
         else:

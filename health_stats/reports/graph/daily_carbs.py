@@ -6,6 +6,10 @@ from plotly.graph_objs import Bar, Scatter
 
 from ..report import Report
 
+from health_stats.models.events import *
+from health_stats.database import DBSession
+from health_stats.dataset import DataSet
+
 
 class DailyCarbs(Report):
 
@@ -22,24 +26,34 @@ class DailyCarbs(Report):
 
         started = False
 
-        for (day, daily_log) in self.stats.days.items():
+        session = DBSession()
+        events = session.query(CarbsEvent)
+        if self.start:
+            events = events.filter(Event.time >= "{}".format(self.start))
+        if self.end:
+            events = events.filter(Event.time <= "{}".format(self.end))
+        events = events.order_by(Event.time)
+        data = DataSet(
+            events,
+            lambda e: e.time.date()
+        )
+
+        for (day, daily_log) in data.group.items():
 
             morn_carbs = []
             noon_carbs = []
             eve_carbs = []
 
-            for event in daily_log.events:
-                if not event.meal:
-                    continue
+            for event in daily_log:
                 started = True
-                hour = event.event_time.hour
-                minute = event.event_time.minute
+                hour = event.time.hour
+                minute = event.time.minute
                 if hour >= 17 or hour <= 4:
-                    eve_carbs.append(event.meal.carbs)
+                    eve_carbs.append(float(event.value))
                 elif hour > 11 or (hour == 11 and minute >= 15):
-                    noon_carbs.append(event.meal.carbs)
+                    noon_carbs.append(float(event.value))
                 else:
-                    morn_carbs.append(event.meal.carbs)
+                    morn_carbs.append(float(event.value))
 
             # don't start counting days until we get at least one data point
             if not started:
