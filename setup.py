@@ -32,7 +32,6 @@ setup_args = dict(
     description='Python utilities for parsing/graphing health-related data like weight, blood pressure, blood glucose, etc.',
     long_description=open('README.md').read(),
     install_requires=install_requires,
-    py_modules=['prep'],
     entry_points={
         'console_scripts': [
             'parse-health-stats = health_stats.cli:parse',
