@@ -1,5 +1,7 @@
 
+import sys
 import datetime
+import dateparser
 from health_stats.models.events import Event
 
 
@@ -11,9 +13,21 @@ class DateRange(object):
         'tz',
     )
 
+    @staticmethod
+    def _parse_date(date, default):
+        if isinstance(date, (datetime.date, datetime.datetime)):
+            return date
+        if date:
+            try:
+                return dateparser.parse(date)
+            except Exception:
+                print "Couldn't parse date: {}".format(date)
+                sys.exit(1)
+        return default
+
     def __init__(self, start, end, tz=None):
-        self.start = start or datetime.datetime.min
-        self.end = end or datetime.datetime.max
+        self.start = self._parse_date(start, datetime.datetime.min)
+        self.end = self._parse_date(end, datetime.datetime.max)
         self.tz = tz
 
     def __contains__(self, other):
