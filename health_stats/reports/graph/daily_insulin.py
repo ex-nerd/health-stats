@@ -47,8 +47,11 @@ class DailyInsulin(Report):
                     long_insulin.append(int(event.value))
                 elif event.subtype == InsulinEvent.TYPE_RAPID:
                     rapid_insulin.append(int(event.value))
+                elif event.subtype is None or event.subtype == InsulinEvent.TYPE_OTHER:
+                    # @todo make an "other insulin" variable
+                    rapid_insulin.append(int(event.value))
                 else:
-                    raise Error("Undefined InsulinEvent subtype: {}".format(event.subtype))
+                    raise Exception("Undefined InsulinEvent subtype: {}".format(event.subtype))
 
             # don't start counting days until we get at least one data point
             if not started:
@@ -81,23 +84,27 @@ class DailyInsulin(Report):
                     ),
                     Scatter(
                         name="Total",
-                        x=day_x, y=day_y,
+                        x=day_x, y=( [None] * len(day_y)),
+                        # x=day_x, y=day_y,
                         text=day_y,
                         mode='markers+text',
+                        # mode='none',
                         marker={
                             'size': 30,
                         },
                         textfont={
                             'color': 'white',
                         },
-                        hoverinfo='none',
+                        # hoverinfo='none',
+                        hoverinfo='markers+text',
                         showlegend=False,
                     ),
                 ],
                 'layout': {
                     'xaxis': {'title': 'Date'},
                     'yaxis': {'title': 'Insulin (u)'},
-                    'barmode': 'stack',
+                    #'barmode': 'stack',
+                    'barmode': 'group',
                 },
             },
             auto_open=False,

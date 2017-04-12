@@ -5,10 +5,11 @@ from . import CSVLogParser
 
 from health_stats.models.events import *
 
-
 class OneTouchRevealLogParser(CSVLogParser):
 
     # FIRST_LINE = 'Item Type,Date and Time,Value,Unit,Manual,Additional Value,Notes'
+
+    SOURCE = SOURCE_ONETOUCH
 
     # Constants for the column names from mysugr
     ITEM_TYPE = "Item Type"
@@ -56,6 +57,7 @@ class OneTouchRevealLogParser(CSVLogParser):
                 insulin_type = None
 
             return InsulinEvent(
+                source=self.SOURCE,
                 time=event_time,
                 subtype=insulin_type,
                 value=int(row[self.VALUE]),
@@ -68,6 +70,7 @@ class OneTouchRevealLogParser(CSVLogParser):
                 raise ValueError("Unrecognized unit in row {}".format(', '.join(row)))
 
             return CarbsEvent(
+                source=self.SOURCE,
                 time=event_time,
                 value=(float(row[self.VALUE]) if row[self.VALUE] else 0),
                 unit='g',
@@ -86,6 +89,7 @@ class OneTouchRevealLogParser(CSVLogParser):
                 raise ValueError("Unrecognized 'manual' in row {}".format(', '.join(row)))
 
             return GlucoseEvent(
+                source=self.SOURCE,
                 time=event_time,
                 value=int(row[self.VALUE]) if row[self.VALUE] else 0,
                 unit=GlucoseEvent.UNIT_MGDL,

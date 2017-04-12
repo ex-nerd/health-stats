@@ -22,4 +22,4 @@ Engine = create_engine(
 Base.metadata.create_all(Engine)
 
 Base.metadata.bind = Engine
-DBSession = sessionmaker(bind=Engine)
+DBSession = sessionmaker(bind=Engine, autoflush=False)

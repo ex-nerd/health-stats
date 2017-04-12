@@ -26,8 +26,8 @@ class ConfigData(object):
     @see http://python-3-patterns-idioms-test.readthedocs.org/en/latest/Singleton.html
     """
 
-    __InputConfig = namedtuple('InputConfig', ['format', 'tz', 'paths'])
-    __ReportConfig = namedtuple('ReportConfig', ['report', 'output'])
+    __InputConfig = namedtuple('InputConfig', ['format', 'tz', 'archive', 'paths'])
+    __ReportConfig = namedtuple('ReportConfig', ['report', 'output', 'date_range'])
 
     class __ConfigData(object):
 
@@ -74,6 +74,7 @@ class ConfigData(object):
                     self.inputs.append(ConfigData.__InputConfig(
                         format=input['format'],
                         tz=input['tz'],
+                        archive=os.path.expanduser(input['archive']),
                         paths=found_paths,
                     ))
 
@@ -85,10 +86,20 @@ class ConfigData(object):
                 # Known report formats?
                 if report['format'] not in Reports:
                     raise ValueError('Unrecognized report file format: {} not in {}'.format(report['format'], Reports))
+                # Custom date range specified?
+                if 'date_range' in report:
+                    date_range = DateRange(
+                        start=report['date_range'].get('start'),
+                        end=report['date_range'].get('end'),
+                        tz=report['date_range'].get('tz'),
+                    )
+                else:
+                    date_range = self.date_range
                 # Expand the path and add this to the list of requested reports to generate
                 self.reports.append(ConfigData.__ReportConfig(
                     report=Reports[report['format']],
                     output=os.path.expanduser(report['output']),
+                    date_range=date_range,
                 ))
 
         def __pretty__(self, p, cycle):

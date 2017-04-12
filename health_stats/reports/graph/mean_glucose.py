@@ -1,3 +1,5 @@
+# -*- coding: utf-8 -*-
+from __future__ import unicode_literals
 
 from datetime import datetime, time
 
@@ -65,7 +67,7 @@ class MeanGlucose(Report):
                 # date_str = daily_log.date.strftime('%b %d')
                 # atext.append('{0}: {1} mg/dl avg &plusmn; {2}'.format(date_str, avg, std))
                 atext.append(
-                    '<b>{}</b><br>{}&sigma;{}'.format(avg, len(glucose_readings), std))
+                    '<b>{}</b><br>{}σ{}'.format(avg, len(glucose_readings), std))
 
         # Extend the average-reading standard deviation lines to the
         # beginning/end of the graph
@@ -124,12 +126,13 @@ class MeanGlucose(Report):
                         mode='markers+text',
                         marker={
                             'color': "rgb(16, 180, 60)",
-                            'size': 50,
+                            'size': 32,
                         },
                         text=atext,
                         hoverinfo='none',
                         textfont={
                             'color': 'white',
+                            'size': 9,
                         }
                         # opacity=.8,
                     ),

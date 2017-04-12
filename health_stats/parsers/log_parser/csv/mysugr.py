@@ -51,6 +51,7 @@ class MySugrLogParser(CSVLogParser):
         # @todo use pytz to convert date to utc...
 
         return Event(
+            source=SOURCE_MYSUGR,
             event_time=datetime.strptime(
                 '{0} {1}'.format(row[self.LOG_DATE], row[self.LOG_TIME]),
                 '%b %d, %Y %I:%M:%S %p'

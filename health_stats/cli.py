@@ -2,7 +2,9 @@
 # Python 2 and 3
 from __future__ import print_function
 
+import os
 import sys
+import datetime
 import argparse
 from pretty import pprint
 
@@ -39,17 +41,28 @@ def parse():
     Config.Initialize(args.config)
 
     # Parse the input files into the database
+    inputs_found = 0
     for input_config in Config.inputs:
         parser_class = Parsers[input_config.format]
         for path in input_config.paths:
-            print(path)
+            print("parsing: {}".format(path))
             parser = parser_class(Config.date_range)
             parser.parse_log(path)
+            inputs_found += 1
+            if input_config.archive:
+                if not os.path.exists(input_config.archive):
+                    os.makedirs(input_config.archive)
+                new_path = os.path.join(input_config.archive, '{}-{}'.format(datetime.datetime.now().strftime('%Y%m%d%H%M%S'), os.path.basename(path)))
+                print("archiving to: {}".format(new_path))
+                os.rename(path, new_path)
 
     # Make some output
     for report in Config.reports:
         r = report.report(
-            start=Config.date_range.start,
-            end=Config.date_range.end,
+            start=report.date_range.start,
+            end=report.date_range.end,
         )
         r.render(report.output)
+
+    # Exit, but only report success if we actually imported new data
+    sys.exit(0 if inputs_found else 1)
