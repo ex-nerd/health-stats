@@ -175,7 +175,7 @@ class GlucoseEvent(Event):
         'polymorphic_identity': TYPE_GLUCOSE
     }
 
-    UNIT_MGDL = 'mg/dl'
+    UNIT_MGDL = 'mg/dL'
 
     @validates('value')
     def validate_value(self, key, value):

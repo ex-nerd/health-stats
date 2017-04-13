@@ -30,7 +30,7 @@ class DailySummary(Report):
                 for event in reversed(daily_log):
                     text_log = []
                     if event.type == TYPE_GLUCOSE:
-                        text_log.append('glucose:   {0} mg/dl'.format(event.value))
+                        text_log.append('glucose:   {0} mg/dL'.format(event.value))
                     if event.type == TYPE_INSULIN:
                         if event.subtype == InsulinEvent.TYPE_LONG:
                             text_log.append('lantus:    {0}'.format(event.value))

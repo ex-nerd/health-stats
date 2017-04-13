@@ -65,7 +65,7 @@ class MeanGlucose(Report):
                 ay_lower.append(float(avg) - float(std))
                 # ay_error.append(std)
                 # date_str = daily_log.date.strftime('%b %d')
-                # atext.append('{0}: {1} mg/dl avg &plusmn; {2}'.format(date_str, avg, std))
+                # atext.append('{0}: {1} mg/dL avg &plusmn; {2}'.format(date_str, avg, std))
                 atext.append(
                     '<b>{}</b><br>{}σ{}'.format(avg, len(glucose_readings), std))
 
@@ -139,7 +139,7 @@ class MeanGlucose(Report):
                 ],
                 'layout': {
                     'xaxis': {'title': 'Date'},
-                    'yaxis': {'title': 'Glucose mg/dl'},
+                    'yaxis': {'title': 'Glucose mg/dL'},
                     'showlegend': False,
                 },
             },
