@@ -126,13 +126,13 @@ class MeanGlucose(Report):
                         mode='markers+text',
                         marker={
                             'color': "rgb(16, 180, 60)",
-                            'size': 32,
+                            'size': 22,
                         },
                         text=atext,
                         hoverinfo='none',
                         textfont={
                             'color': 'white',
-                            'size': 9,
+                            'size': 6,
                         }
                         # opacity=.8,
                     ),

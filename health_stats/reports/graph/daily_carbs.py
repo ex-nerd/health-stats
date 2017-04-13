@@ -98,11 +98,11 @@ class DailyCarbs(Report):
                         text=day_y,
                         mode='markers+text',
                         marker={
-                            'size': 24,
+                            'size': 16,
                         },
                         textfont={
                             'color': 'white',
-                            'size': 9,
+                            'size': 6,
                         },
                         hoverinfo='none',
                         showlegend=False,
