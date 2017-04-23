@@ -11,7 +11,7 @@ class OneTouchRevealLogParser(CSVLogParser):
 
     SOURCE = SOURCE_ONETOUCH
 
-    # Constants for the column names from mysugr
+    # Constants for the column names from onetouch
     ITEM_TYPE = "Item Type"
     DATE_TIME = "Date and Time"
     VALUE = "Value"
