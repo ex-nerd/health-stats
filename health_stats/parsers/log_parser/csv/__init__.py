@@ -36,34 +36,25 @@ class CSVLogParser(LogParser):
     def parse_log(self, path):
         session = DBSession()
 
-        # find earlieriest/latest and delete any existing rows from this range
+        # Read in all of the events
         reader = unicode_csv_dictreader(path)
-        firstrow = reader.next()
-        for lastrow in reader:
-            pass
-        # @todo time isn't getting validated yet here.....
-        t1 = self.parse_row(firstrow).time
-        t2 = self.parse_row(lastrow).time
-        if t1 > t2:
-            t1, t2 = t2, t1
-        # To avoid false duplicates and clear out any data altered/removed in
-        # the source, delete any existing rows from this source and time period.
-        num = session.query(Event) \
-            .filter(Event.time >= "{}.000000".format(t1)) \
-            .filter(Event.time <= "{}.000000".format(t2)) \
-            .filter(Event.source == "{}".format(self.SOURCE)) \
-            .delete()
-        print("Deleting {} events from this source between {} and {}".format(num, t1, t2))
+        csv_events = []
+        for row in reader:
+            event = self.parse_row(row)
+            if event:
+                csv_events.append(event)
+
+        # find earlieriest/latest and delete any existing rows from this range
+        times = [e.time for e in csv_events]
+        self._flush_old_data(session, self.SOURCE, min(times), max(times))
         session.commit()
-        # sys.exit()
 
         # Now we can restart the csv reader to actually load the data
-        reader = unicode_csv_dictreader(path)
-        num = 0
-        for row in reader:
-            session.merge(self.parse_row(row))
-            num += 1
-        print("Adding {} events".format(num))
+        for event in csv_events:
+            # print("evt {}: {}".format(event.id, event))
+            session.merge(event)
+            # session.commit()
+        print("Adding {} events".format(len(csv_events)))
         session.commit()
 
     def parse_row(self, row):
