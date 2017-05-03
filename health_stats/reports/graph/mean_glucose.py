@@ -1,20 +1,17 @@
 # -*- coding: utf-8 -*-
 from __future__ import unicode_literals
 
-from datetime import datetime, time
-
-from plotly.offline import plot
-from plotly.graph_objs import Scatter
-
-from ..report import Report
-
-from health_stats.models.events import *
-from health_stats.database import DBSession
-from health_stats.dataset import DataSet
+from datetime import time, timedelta
 
 import numpy
+from plotly.graph_objs import Scatter
+from plotly.offline import plot
 
-# from sqlalchemy.orm import with_polymorphic
+from health_stats.database import DBSession
+from health_stats.dataset import DataSet
+from health_stats.models.events import *
+from ..report import Report
+
 
 
 class MeanGlucose(Report):
@@ -23,6 +20,8 @@ class MeanGlucose(Report):
         # Plot glucose values
         gx = []
         gy = []
+        cgx = []
+        cgy = []
         gtext = []
         # Plot glucose averages
         ax = []
@@ -48,11 +47,16 @@ class MeanGlucose(Report):
             glucose_readings = []
             for event in daily_log:
                 glucose_readings.append(int(event.value))
-                gx.append(event.time)
-                gy.append(int(event.value))
-                gtext.append("{0}: {1}".format(
-                    event.time.strftime('%I:%M %p'), event.value
-                ))
+                if event.subtype == GlucoseEvent.TYPE_METER:
+                    gx.append(event.time)
+                    gy.append(int(event.value))
+                    gtext.append("{0}: {1}".format(
+                        event.time.strftime('%I:%M %p'), event.value
+                    ))
+                elif event.subtype == GlucoseEvent.TYPE_CGM:
+                    cgx.append(event.time)
+                    cgy.append(int(event.value))
+
 
             # Process other daily stats
             if glucose_readings:
@@ -119,6 +123,22 @@ class MeanGlucose(Report):
                         line=dict(color='#213ECF'),
                         opacity=.3,
                     ),
+                    # Need a better scale before we can show CGM data properly.
+                    Scatter(
+                        name="cgm",
+                        x=cgx, y=cgy,
+                        mode='lines+markers',
+                        marker={
+                            'color': '#008000',
+                            'size': 2,
+                        },
+                        line={
+                            'color': '#008000',
+                            'shape': 'spline',
+                            # 'smoothing': .5,
+                        },
+                        opacity=.3,
+                    ),
                     # Daily average and text labels
                     Scatter(
                         name="daily average",
@@ -138,8 +158,13 @@ class MeanGlucose(Report):
                     ),
                 ],
                 'layout': {
-                    'xaxis': {'title': 'Date'},
-                    'yaxis': {'title': 'Glucose mg/dL'},
+                    'xaxis': {
+                        'title': 'Date',
+                        'range': [max(gx) - timedelta(days=14), max(gx) + timedelta(hours=1)],
+                    },
+                    'yaxis': {
+                        'title': 'Glucose mg/dL'
+                    },
                     'showlegend': False,
                 },
             },
