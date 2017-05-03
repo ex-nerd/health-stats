@@ -1,3 +1,5 @@
+# -*- coding: utf-8 -*-
+
 from datetime import datetime
 from pretty import pprint
 
@@ -90,6 +92,7 @@ class OneTouchRevealLogParser(CSVLogParser):
 
             return GlucoseEvent(
                 source=self.SOURCE,
+                subtype=GlucoseEvent.TYPE_METER,
                 time=event_time,
                 value=int(row[self.VALUE]) if row[self.VALUE] else 0,
                 unit=GlucoseEvent.UNIT_MGDL,

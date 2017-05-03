@@ -189,6 +189,9 @@ class GlucoseEvent(Event):
 
     UNIT_MGDL = 'mg/dL'
 
+    TYPE_METER = 'm'
+    TYPE_CGM = 'cgm'
+
     @validates('value')
     def validate_value(self, key, value):
         # Yeah, I know you'd be dead at 1, but let's not make any judgments
