@@ -164,9 +164,18 @@ class InsulinEvent(Event):
         'polymorphic_identity': TYPE_INSULIN,
     }
 
+    UNIT_U = 'u'
+
     TYPE_RAPID = 'rapid'
     TYPE_LONG = 'long'
     TYPE_OTHER = 'other'
+
+    def __init__(self, **kwargs):
+        super(InsulinEvent, self).__init__(**kwargs)
+        if self.unit is None:
+            self.unit = self.UNIT_U
+        # Now that we have a unit, (re)generate the id
+        self.id = self.generate_id()
 
     @validates('subtype')
     def validate_subtype(self, key, subtype):
@@ -194,6 +203,13 @@ class GlucoseEvent(Event):
 
     TYPE_METER = 'm'
     TYPE_CGM = 'cgm'
+
+    def __init__(self, **kwargs):
+        super(GlucoseEvent, self).__init__(**kwargs)
+        if self.unit is None:
+            self.unit = self.UNIT_MGDL
+        # Now that we have a unit, (re)generate the id
+        self.id = self.generate_id()
 
     @validates('value')
     def validate_value(self, key, value):
