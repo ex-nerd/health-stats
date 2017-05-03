@@ -1,5 +1,6 @@
 .health_stats
 config.yml
+.idea
 
 # Byte-compiled / optimized / DLL files
 __pycache__/
