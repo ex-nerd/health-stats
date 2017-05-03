@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 
-from datetime import datetime, time
+from datetime import datetime, time, timedelta
 
 from plotly.offline import plot
 from plotly.graph_objs import Bar, Scatter
@@ -78,6 +78,10 @@ class DailyCarbs(Report):
 
             day_y.append(day_total if day_total else None)
 
+        # Restrict the viewport
+        min_x = max(day_x) - timedelta(days=14)
+        max_x = max(day_x) + timedelta(days=1)
+
         plot(
             {
                 'data': [
@@ -110,7 +114,10 @@ class DailyCarbs(Report):
                     ),
                 ],
                 'layout': {
-                    'xaxis': {'title': 'Date'},
+                    'xaxis': {
+                        'title': 'Date',
+                        'range': [min_x, max_x],
+                    },
                     'yaxis': {'title': 'Carbs (g)'},
                     'barmode': 'stack',
                 },

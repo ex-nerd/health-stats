@@ -83,6 +83,10 @@ class MeanGlucose(Report):
         ay_lower.insert(0, ay_lower[0])
         ay_lower.append(ay_lower[-1])
 
+        # Restrict the viewport
+        min_x = max(gx) - timedelta(days=14)
+        max_x = max(gx) + timedelta(hours=1)
+
         plot(
             {
                 'data': [
@@ -160,7 +164,7 @@ class MeanGlucose(Report):
                 'layout': {
                     'xaxis': {
                         'title': 'Date',
-                        'range': [max(gx) - timedelta(days=14), max(gx) + timedelta(hours=1)],
+                        'range': [min_x, max_x],
                     },
                     'yaxis': {
                         'title': 'Glucose mg/dL'
