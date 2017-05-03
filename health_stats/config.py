@@ -73,7 +73,7 @@ class ConfigData(object):
                     self.inputs.append(ConfigData.__InputConfig(
                         format=input['format'],
                         tz=input['tz'],
-                        archive=os.path.expanduser(input['archive']),
+                        archive=os.path.expanduser(input['archive']) if 'archive' in input else None,
                         paths=found_paths,
                     ))
 

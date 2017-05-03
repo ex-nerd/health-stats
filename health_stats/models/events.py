@@ -1,3 +1,5 @@
+# -*- coding: utf-8 -*-
+
 # python 2-3 compatibility
 from builtins import super, int, object
 
