@@ -57,17 +57,27 @@ class Event(Base):
 
     def __init__(self, **kwargs):
         super(Event, self).__init__(**kwargs)
-        if self.id is None:
-            self.id = None
+        self.id = self.generate_id()
 
-    @validates('id')
-    def validate_id(self, key, id):
-        # In general, we want each row to be unique, but other types may want
-        # to override this to avoid duplicate entries of the same type from
-        # different sources.
-        m = hashlib.sha1()
-        m.update(repr(self.__dict__))
-        return m.hexdigest()
+    def generate_id(self):
+        if None in (self.time, self.type, self.source, self.value, self.unit, ):
+            # Not enough data to calculate
+            return None
+        else:
+            # Turn the data we care about into a sha1 that should be unique enough for our purposes.
+            data = (
+                self.time,
+                self.type,
+                self.subtype,
+                self.source,
+                self.value,
+                self.unit,
+                self.notes,
+                self.tags,
+            )
+            m = hashlib.sha1()
+            m.update(repr(data))
+            return m.hexdigest()
 
     @validates('time')
     def validate_time(self, key, time):
