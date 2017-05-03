@@ -20,17 +20,20 @@ TYPE_GLUCOSE = 'glucose'
 TYPE_CARBS = 'carbs'
 TYPE_WEIGHT = 'weight'
 TYPE_BLOOD_PRESSURE = 'bp'
+TYPE_STEPS = 'steps'
 
 # And for sources
 SOURCE_ONETOUCH = 'ot'
 SOURCE_MYSUGR = 'ms'
 SOURCE_APPLE_HEALTH = 'ah'
+SOURCE_DEXCOM_CLARITY = 'dc'
 
 # Now map back to human names
 SOURCE_NAME = {
     SOURCE_ONETOUCH: 'OneTouch',
     SOURCE_MYSUGR: 'MySugr',
     SOURCE_APPLE_HEALTH: 'Apple Health',
+    SOURCE_DEXCOM_CLARITY: 'Dexcom Clarity',
 }
 
 class Event(Base):
@@ -93,7 +96,7 @@ class Event(Base):
 
     @validates('source')
     def validate_source(self, key, source):
-        if source not in (SOURCE_ONETOUCH, SOURCE_MYSUGR, SOURCE_APPLE_HEALTH, ):
+        if source not in SOURCE_NAME.keys():
             raise ValueError('Unrecognized source type at {}: {}'.format(self.time, source))
         return source
 
@@ -249,4 +252,18 @@ class BloodPressureEvent(Event):
     def validate_value(self, key, value):
         if re.match(r'^\d{2,3}/\d{2,3}$', value) is None:
             raise ValueError('Unrecognized blood pressure value at {}: {}'.format(self.time, value))
+        return value
+
+
+class StepsEvent(Event):
+    """ Event type representing a count of steps """
+
+    __mapper_args__ = {
+        'polymorphic_identity': TYPE_STEPS,
+    }
+
+    @validates('value')
+    def validate_value(self, key, value):
+        if value < 1:
+            raise ValueError('Unrecognized steps value at {}: {}'.format(self.time, value))
         return value
