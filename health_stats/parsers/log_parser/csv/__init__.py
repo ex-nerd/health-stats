@@ -36,24 +36,24 @@ class CSVLogParser(LogParser):
     def parse_log(self, path):
         session = DBSession()
 
-        # Read in all of the events
+        # Read in all of the events.
+        # Use a dict because we occasionally see duplicate entries, and session.merge() isn't perfect.
         reader = unicode_csv_dictreader(path)
-        csv_events = []
+        csv_events = {}
         for row in reader:
             event = self.parse_row(row)
             if event:
-                csv_events.append(event)
+                csv_events[event.id] = event
 
         # find earlieriest/latest and delete any existing rows from this range
-        times = [e.time for e in csv_events]
+        times = [e.time for e in csv_events.values()]
         self._flush_old_data(session, self.SOURCE, min(times), max(times))
         session.commit()
 
         # Now we can restart the csv reader to actually load the data
-        for event in csv_events:
-            # print("evt {}: {}".format(event.id, event))
+        # There are some
+        for event in csv_events.values():
             session.merge(event)
-            # session.commit()
         print("Adding {} events".format(len(csv_events)))
         session.commit()
 
