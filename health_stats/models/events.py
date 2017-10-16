@@ -58,9 +58,10 @@ class Event(Base):
         'polymorphic_identity': TYPE_NONE,
     }
 
-    def __init__(self, **kwargs):
+    def __init__(self, skip_id=False, **kwargs):
         super(Event, self).__init__(**kwargs)
-        self.id = self.generate_id()
+        if not skip_id:
+            self.id = self.generate_id()
 
     def generate_id(self):
         if None in (self.time, self.type, self.source, self.value, self.unit, ):
@@ -171,7 +172,7 @@ class InsulinEvent(Event):
     TYPE_OTHER = 'other'
 
     def __init__(self, **kwargs):
-        super(InsulinEvent, self).__init__(**kwargs)
+        super(InsulinEvent, self).__init__(skip_id=True, **kwargs)
         if self.unit is None:
             self.unit = self.UNIT_U
         # Now that we have a unit, (re)generate the id
@@ -205,7 +206,7 @@ class GlucoseEvent(Event):
     TYPE_CGM = 'cgm'
 
     def __init__(self, **kwargs):
-        super(GlucoseEvent, self).__init__(**kwargs)
+        super(GlucoseEvent, self).__init__(skip_id=True, **kwargs)
         if self.unit is None:
             self.unit = self.UNIT_MGDL
         # Now that we have a unit, (re)generate the id
