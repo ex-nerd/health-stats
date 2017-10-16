@@ -169,6 +169,56 @@ class MeanGlucose(Report):
                     'yaxis': {
                         'title': 'Glucose mg/dL'
                     },
+                    'shapes': [
+                        {
+                            'type': 'line',
+                            'x0': min_x,
+                            'y0': 180,
+                            'x1': max_x,
+                            'y1': 180,
+                            'line': {
+                                'color': '#E83E43',
+                                'width': 1,
+                                'dash': 'dashdot',
+                            },
+                        },
+                        {
+                            'type': 'line',
+                            'x0': min_x,
+                            'y0': 120,
+                            'x1': max_x,
+                            'y1': 120,
+                            'line': {
+                                'color': '#E8878D',
+                                'width': 1,
+                                'dash': 'dot',
+                            },
+                        },
+                        {
+                            'type': 'line',
+                            'x0': min_x,
+                            'y0': 80,
+                            'x1': max_x,
+                            'y1': 80,
+                            'line': {
+                                'color': '#86A9F0',
+                                'width': 1,
+                                'dash': 'dot',
+                            },
+                        },
+                        {
+                            'type': 'line',
+                            'x0': min_x,
+                            'y0': 65,
+                            'x1': max_x,
+                            'y1': 65,
+                            'line': {
+                                'color': '#1D22EF',
+                                'width': 1,
+                                'dash': 'dashdot',
+                            },
+                        },
+                    ],
                     'showlegend': False,
                 },
             },
